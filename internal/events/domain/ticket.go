@@ -34,3 +34,22 @@ func (t *Ticket) Validate() error {
 		return ErrTicketPriceZero
 	}
 }
+
+func NewTicket(event *Event, spot *Spot, ticketKind TicketKind) (*Ticket, error) {
+	if !isValidTicketType(ticketKind) {
+		return nil, ErrInvalidTicketKind
+	}
+
+	ticket := &Ticket{
+		ID:         uuid.New().String(),
+		EventID:    event.ID,
+		Spot:       spot,
+		TicketKind: ticketKind,
+		Price:      event.Price,
+	}
+	ticket.CalculatePrice()
+	if err := ticket.Validate(); err != nil {
+		return nil, err
+	}
+	return ticket, nil
+}
